@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit NoSlaps</title>
+    <a href="/home" class="button">Home </a>
+    <a href="/noslaps" class="button">NoSlap-Timers</a>
+    <a href="/settings" class="button">Settings</a>
+
+</head>
+
+<body>
+<h1>Edit NoSlap Timer</h1>
+
+<form method="POST">
+
+    Start Time <input type="time" id="starttime" name="starttime" value={{starttime}} required>
+    <br>
+    End Time <input type="time" id="endtime" name="endtime" value={{endtime}} required>
+    <br>
+    <h2><font color="red">{{select_day}}</font></h2>
+    <input type="checkbox" value=1 name="day"> Monday
+    <input type="checkbox" value=2 name="day"> Tuesday
+    <input type="checkbox" value=3 name="day"> Wednesday
+    <input type="checkbox" value=4 name="day"> Thursday
+    <input type="checkbox" value=5 name="day"> Friday
+    <input type="checkbox" value=6 name="day"> Saturday
+    <input type="checkbox" value=7 name="day"> Sunday
+    <br>
+    Volume (milli dB) <input type="number" name="Volume" min="-1000" max="1000" value={{def_volume}}>
+
+    Activate <input type="checkbox" value="true" name="activated" checked>
+
+    <br>
+    <br>
+    <input type="submit" value="Save NoSlap">
+
+</form>
+
+</body>
+</html>

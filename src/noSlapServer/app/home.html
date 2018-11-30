@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>NoSlap Home</title>
+    <a href="/home" class="button">Home </a>
+    <a href="/noslaps" class="button">NoSlap-Timers</a>
+    <a href="/settings" class="button">Settings</a>
+
+</head>
+<body>
+<h3>Because a wonderful morning doesn't begin with a Slap.</h3>
+ It is:
+<p><span id="datetime"></span></p>
+
+<script>
+var dt = new Date();
+document.getElementById("datetime").innerHTML = dt.toLocaleString();
+</script>
+
+
+<h2>Next NoSlaps:</h2>
+
+
+<table style="width:75%">
+      <tr>
+    <th>ID</th>
+    <th>Start Time</th>
+    <th>End Time</th>
+    <th>Days</th>
+    <th>Volume</th>
+    <th>Activated</th>
+    <th> </th>
+  </tr>
+    <ol>
+        {% for slap in noslaps %}
+          <tr>
+    <td>{{slap.ID}}</td>
+    <td>{{slap.START_TIME}}</td>
+    <td>{{slap.END_TIME}}</td>
+    <td>{{slap.DAYS}}</td>
+    <td>{{slap.VOLUME}}</td>
+    <td>{{slap.ACTIVATED}}</td>
+    <td><a href="/edit-noslap/{{slap.ID}}"> Edit </a></td>
+    <td><a href="/delete-noslap/{{slap.ID}}"> X </a></td>
+  </tr>
+{% endfor %}
+
+    </ol>
+</table>
+    <!--{{noslaps[0]}} -->
+<p> {{noslaps_string}}</p>
+
+<a href="/edit-noslap/"> Add new timer </a>
+
+</body>
+</html>

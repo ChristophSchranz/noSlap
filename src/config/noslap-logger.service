@@ -1,0 +1,14 @@
+[Unit]
+Description=NoSlap Logger, get up easier
+After=network.target
+
+[Service]
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/noSlap/src/
+ExecStart=/usr/bin/python3 /home/pi/noSlap/src/motion_measurement.py
+Restart=always
+RuntimeMaxSec=129600
+
+[Install]
+WantedBy=multi-user.target

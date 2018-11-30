@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Settings</title>
+    <a href="/home" class="button">Home </a>
+    <a href="/noslaps" class="button">NoSlap-Timers</a>
+    <a href="/settings" class="button">Settings</a>
+
+</head>
+<body>
+<h1>Update the settings for the NoSlap recognition:</h1>
+<h2><font color="green">{{status}}</font></h2>
+
+<style>
+  textarea {
+  width: 75%;
+  height: 250px;
+  padding: 12px 20px;
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+  font-size: 16px;
+  resize: none;
+  }
+</style>
+
+<form method="POST">
+    <br>
+    <textarea name="textbox"> {{settings}} </textarea>
+    <br>
+    <input type="submit" value="Save Settings">
+</form>
+</body>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+</html>
