@@ -12,12 +12,12 @@
     },
     {
       "ID": 0,
-      "START_TIME": "23:07",
-      "END_TIME": "23:40",
+      "START_TIME": "00:26",
+      "END_TIME": "01:40",
       "DAYS": [
-        5
+        6
       ],
-      "VOLUME": 100,
+      "VOLUME": -100,
       "ACTIVATED": true
     }
   ]

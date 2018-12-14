@@ -214,6 +214,7 @@ if __name__ == '__main__':
                 next_slap = slap
     print("Next Slap: {}".format(next_slap))
 
+    next_slap = no_slaps["NOSLAPS"][-1]  # remove
     # calling the main method with standard parameter in UTC time
     if next_slap is not None:
         start_time = next_slap["START_TIME"]
@@ -225,3 +226,4 @@ if __name__ == '__main__':
         no_slap = NoSlap(start_time, end_time, days, volume, testing)
         # no_slap = NoSlap(**next_slap)
         no_slap.run()
+
