@@ -1,7 +1,4 @@
 {
-    "VOLUME": 0,
-    "START_TIME": "18:26",
-    "END_TIME": "18:50",
     "MAGNITUE_THRESHOLD": 50,
     "MIN_CHANGE": 30,
         "MAX_CHANGE": 20000,

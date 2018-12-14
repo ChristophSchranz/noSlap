@@ -23,18 +23,13 @@
       "ACTIVATED": true
     },
     {
-      "DAYS": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6
-      ],
       "ID": 2,
-      "END_TIME": "08:00",
-      "VOLUME": 100,
       "START_TIME": "07:00",
+      "END_TIME": "08:00",
+      "DAYS": [
+        2
+      ],
+      "VOLUME": 100,
       "ACTIVATED": true
     }
   ]

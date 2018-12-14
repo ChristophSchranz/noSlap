@@ -9,26 +9,30 @@ from PIL import Image
 from datetime import datetime
 import pytz
 
-    # print(type(content))
 
 ##main class and definitions
 ##initially setting images to compare to None
 ##creating a csv file with with the cration time as name
-class App:
-    def __init__(self):
+class NoSlap:
+    def __init__(self, start_time, end_time, days, volume=0, testing=False):
+        self.VOLUME = volume  # content.get("VOLUME", 0)
+        self.START_TIME = start_time  # content.get("START_TIME", "07:00:00")
+        self.END_TIME = end_time  # content.get("END_TIME", "08:00:00")
+        self.DAYS = days  # [1,2,3,4,5]  # TODO read config json
+
+        if testing:
+            print("Started NoSlap instance in demo mode")
+            return
+
         ## defining image dimensions, directory, movement threshold
         with open("config/config.json") as f:
             content = json.loads(f.read())
         ##variables are not called yet, they should replace the ones, assigned in the check.Motion method
-        self.VOLUME = content.get("VOLUME", 0)
-        self.START_TIME = content.get("START_TIME", "07:00:00")
-        self.END_TIME = content.get("END_TIME", "08:00:00")
         self.THRESHOLD = content.get("MAGNITUDE_THRESHOLD", 50)
         self.MIN_CHANGE = content.get("MIN_CHANGE", 30)
         self.MAX_CHANGE = content.get("MAX_CHANGE", 20000)
         self.RECENT_VALUES = content.get("RECENT_VALUES", 10)
         self.AWAKE = content.get("AWAKE", 5)
-        self.DAYS = [1,2,3,4,5]  # TODO read config json
         self.PORT = content.get("PORT", 1810)
         self.WIDTH = 400
         self.HEIGHT = 300
@@ -165,12 +169,13 @@ class App:
             self.takePhoto()
             self.checkMotion()
             print("alarm")    
-            time.sleep(0.2)##changed from 0.5
+            time.sleep(0.2)  # changed from 0.5
         print("pass")
         self.playsound()
         print("pass")
 
-##calling the main method
-App()           
+
+if __name__ == '__main__':
         
-        
+    ##calling the main method with standard parameter
+    no_slap = NoSlap("07:00:00", "08:00:00", days=[1, 2, 3, 4, 5], volume=0, testing=True)
