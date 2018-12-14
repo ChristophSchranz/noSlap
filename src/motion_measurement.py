@@ -6,6 +6,7 @@
 ##-----------------------------------------------------------------
 import os, sys, time, json, inspect
 from PIL import Image
+import logging
 from datetime import datetime
 import pytz
 
@@ -15,14 +16,19 @@ import pytz
 ##creating a csv file with with the cration time as name
 class NoSlap:
     def __init__(self, start_time, end_time, days, volume=0, testing=False):
+        logging.basicConfig()
+        self.logger = logging.getLogger("NoSlap")
+        self.logger.setLevel(logging.DEBUG)
+        self.logger.info("Started NoSlap Logger")
+
         self.VOLUME = volume  # content.get("VOLUME", 0)
         self.START_TIME = start_time  # content.get("START_TIME", "07:00:00")
         self.END_TIME = end_time  # content.get("END_TIME", "08:00:00")
         self.DAYS = days  # [1,2,3,4,5]  # TODO read config json
         self.testing = testing
-
+        self.logger.info("Next Slap: {}".format(self.START_TIME))
         if testing:
-            print("Started NoSlap instance in demo mode")
+            self.logger.info("Started NoSlap instance in demo mode")
 
         ## defining image dimensions, directory, movement threshold
         with open("config/config.json") as f:
@@ -39,7 +45,7 @@ class NoSlap:
         self.BBOX= (50, 100, 350, 200)
         self.FILENAME = inspect.getframeinfo(inspect.currentframe()).filename
         self.BASEDIR = os.path.dirname(os.path.realpath(self.FILENAME))
-        print("basedir: ", self.BASEDIR)
+        self.logger.debug("basedir: {}".format(self.BASEDIR))
         ##BASEDIR = os.path.dirname(os.path.abspath(__file__))
         self.PATH = self.BASEDIR + '/images/image.jpg'
         self.THRESHOLD = 50
@@ -58,11 +64,11 @@ class NoSlap:
             start_datetime = datetime.strptime(" ".join([datetime.now().date().isoformat(), self.START_TIME]), "%Y-%m-%d %H:%M")
         except ValueError:
             start_datetime = datetime.strptime(" ".join([datetime.now().date().isoformat(), self.START_TIME]), "%Y-%m-%d %H:%M:%S")
-        print(start_datetime)
+        self.logger.info(start_datetime)
         # local_dt = local.localize(start_datetime, is_dst=None)
         # self.START_TIME = local_dt.astimezone(pytz.utc).time().isoformat()
         self.START_TIME = start_datetime.time().isoformat()
-        print("From {}".format(self.START_TIME))
+        self.logger.debug("From {}".format(self.START_TIME))
 
         try:
             end_datetime = datetime.strptime (" ".join([datetime.now().date().isoformat(), self.END_TIME]), "%Y-%m-%d %H:%M")
@@ -71,7 +77,7 @@ class NoSlap:
         # local_dt = local.localize(end_datetime, is_dst=None)
         # self.END_TIME = local_dt.astimezone(pytz.utc).time().isoformat()
         self.START_TIME = start_datetime.time().isoformat()
-        print("To {}".format(self.END_TIME))
+        self.logger.debug("To {}".format(self.END_TIME))
         
         ##looping through the datafiles and remove files older than a week
         self.datafile = self.BASEDIR + '/data/data_' + datetime.utcnow().replace(tzinfo=pytz.UTC) \
@@ -105,7 +111,7 @@ class NoSlap:
             ##append the change value to a list
             changed = self.getDifference(old, new)
             timestamp = datetime.utcnow().replace(tzinfo=pytz.UTC).isoformat()
-            print("{}, {}".format(timestamp, changed))
+            self.logger.debug("{}, {}".format(timestamp, changed))
             with open(self.datafile, 'a') as file:
                 file.write("\n{}, {}".format(timestamp, changed))
             self.changelist.append(changed)
@@ -125,13 +131,13 @@ class NoSlap:
                             print(motiondetect)
                     backwards -= 1
                 if motiondetect >= self.AWAKE:
-                    print("Alarm")
+                    self.logger.info("Alarm")
                     self.alarm = True
                     ##return alarm
                     ##self.playsound()
         elif self.testing:
             timestamp = datetime.now().replace(microsecond=0).replace(tzinfo=pytz.UTC).time().isoformat()
-            print("debug: time: {}, start_time: {}, motiondetect: {}".format(timestamp, self.START_TIME,
+            self.logger.info("debug: time: {}, start_time: {}, motiondetect: {}".format(timestamp, self.START_TIME,
                                                                              self.motiondetect))
             if timestamp < self.START_TIME:
                 return
@@ -143,11 +149,10 @@ class NoSlap:
         try:
             os.popen("pkill omxplayer")
         except:
-            print("omxplayer not found")
+            self.logger.info("omxplayer not found")
 
     def playsound (self):
         os.popen("omxplayer music/Arctic\ Monkeys\ -\ Do\ I\ Wanna\ Know.mp3 --vol -500 &")
-        print("pass 39")
                     
                 
     ##method to detect changes in pixels of the two photos
@@ -176,14 +181,14 @@ class NoSlap:
             ##print(curtime)
             #           currenttime = timecounter()
             self.curtime = datetime.now()
-            print("Current time: {}".format(self.curtime))
+            self.logger.debug("Current time: {}".format(self.curtime))
             time.sleep(2)  # Set back to 0.1
 
-        print(self.datafile)
+        self.logger.debug(self.datafile)
         with open(self.datafile, "w") as file:
             file.write("Timestamp, DifferentPixels")
         curtime = datetime.utcnow()
-        print(curtime.time().isoformat())
+        self.logger.debug(curtime.time().isoformat())
         self.alarm = False
         while (self.alarm == False) and (curtime.time().isoformat() < self.END_TIME):##change from alarm == False:
             curtime = datetime.utcnow()
@@ -191,9 +196,9 @@ class NoSlap:
             self.checkMotion()
             # print("alarm")
             time.sleep(0.2)  # changed from 0.5
-        print("pass 30")
+        self.logger.debug("pass 30")
         self.playsound()
-        print("pass 40")
+        self.logger.debug("pass 40")
 
 
 if __name__ == '__main__':
