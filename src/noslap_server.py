@@ -3,6 +3,7 @@
 import os
 import sys
 import json
+import time
 import socket
 import pytz
 import logging
@@ -10,6 +11,7 @@ from datetime import datetime
 from dateutil.parser import parse
 from flask import Flask, jsonify, request, render_template, redirect, abort
 from redis import Redis
+from multiprocessing import Process
 
 from src.motion_measurement import NoSlap
 
@@ -62,13 +64,16 @@ class NoSlapTools:
         for slap in noslaps["NOSLAPS"]:
             print(slap)
             if slap["ACTIVATED"]:
-                no_slap = NoSlap(slap["START_TIME"], slap["END_TIME"], days=slap["DAYS"], volume=slap["VOLUME"],
-                                 testing=True)
+                # no_slap = NoSlap(slap["START_TIME"], slap["END_TIME"], days=slap["DAYS"], volume=slap["VOLUME"], testing=False)
+                no_slap = Process(target=NoSlap, args=(slap["START_TIME"], slap["END_TIME"],
+                                                       slap["DAYS"], slap["VOLUME"], False,))
+                no_slap.start()
+                print("hello")
                 self.noslaplist.append(no_slap)
 
     def stop_timers(self):
         for noslap in self.noslaplist:
-            noslap.killplayer()
+            noslap.join()
         print("Removed all players")
 
 
@@ -214,9 +219,12 @@ if __name__ == '__main__':
     logger = logging.getLogger("NoSlapServer")
     logger.setLevel(logging.INFO)
     logging.basicConfig()
-    noslaptools = NoSlapTools()
-    noslaptools.run_tests()
+    #noslaptools = NoSlapTools()
+    #noslaptools.run_tests()
+
+    res = os.popen("ls -la").read()
+    print(res)
+
     logger.info("Starting NoSlap Server on port: {}".format(PORT))
-    noslaptools.start_timers()
 
     app.run(host="0.0.0.0", debug=False, port=PORT)

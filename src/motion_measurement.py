@@ -19,10 +19,10 @@ class NoSlap:
         self.START_TIME = start_time  # content.get("START_TIME", "07:00:00")
         self.END_TIME = end_time  # content.get("END_TIME", "08:00:00")
         self.DAYS = days  # [1,2,3,4,5]  # TODO read config json
+        self.testing = testing
 
         if testing:
             print("Started NoSlap instance in demo mode")
-            return
 
         ## defining image dimensions, directory, movement threshold
         with open("config/config.json") as f:
@@ -38,12 +38,14 @@ class NoSlap:
         self.HEIGHT = 300
         self.BBOX= (50, 100, 350, 200)
         self.FILENAME = inspect.getframeinfo(inspect.currentframe()).filename
-        self.BASEDIR = os.path.dirname(os.path.abspath(self.FILENAME))
+        self.BASEDIR = os.path.dirname(os.path.realpath(self.FILENAME))
+        print("basedir: ", self.BASEDIR)
         ##BASEDIR = os.path.dirname(os.path.abspath(__file__))
         self.PATH = self.BASEDIR + '/images/image.jpg'
         self.THRESHOLD = 50
         self.changelist = []
         self.alarm = False
+        self.motiondetect = 0
         
         self.image=None                          
         self.pImage=None                          
@@ -52,15 +54,22 @@ class NoSlap:
         
         ##changing the start and end time to utc format
         local = pytz.timezone ("Europe/Vienna")
-        start_datetime = datetime.strptime (" ".join([datetime.now().date().isoformat(), self.START_TIME]), "%Y-%m-%d %H:%M")
+        try:
+            start_datetime = datetime.strptime(" ".join([datetime.utcnow().date().isoformat(), self.START_TIME]), "%Y-%m-%d %H:%M")
+        except ValueError:
+            start_datetime = datetime.strptime(" ".join([datetime.utcnow().date().isoformat(), self.START_TIME]), "%Y-%m-%d %H:%M:%S")
+
         local_dt = local.localize(start_datetime, is_dst=None)
         self.START_TIME = local_dt.astimezone(pytz.utc).time().isoformat()
-        print(self.START_TIME)
-        
-        end_datetime = datetime.strptime (" ".join([datetime.now().date().isoformat(), self.END_TIME]), "%Y-%m-%d %H:%M")
+        print("From {}".format(self.START_TIME))
+
+        try:
+            end_datetime = datetime.strptime (" ".join([datetime.now().date().isoformat(), self.END_TIME]), "%Y-%m-%d %H:%M")
+        except ValueError:
+            end_datetime = datetime.strptime (" ".join([datetime.now().date().isoformat(), self.END_TIME]), "%Y-%m-%d %H:%M:%S")
         local_dt = local.localize(end_datetime, is_dst=None)
         self.END_TIME = local_dt.astimezone(pytz.utc).time().isoformat()
-        print(self.END_TIME)
+        print("To {}".format(self.END_TIME))
         
         ##looping through the datafiles and remove files older than a week
         self.datafile = self.BASEDIR + '/data/data_' + datetime.utcnow().replace(tzinfo=pytz.UTC) \
@@ -72,32 +81,20 @@ class NoSlap:
             self.filepath = os.path.join(self.datadir, file)
             if os.path.getctime(self.filepath) < (self.realseconds-(3600*24*7)):
                 os.remove(self.filepath)
-        
-        
-        self.curtime = datetime.utcnow()
-        while (self.curtime.isoweekday() not in self.DAYS) or (self.curtime.time().isoformat() < self.START_TIME):
-            ##print(curtime)
-#           currenttime = timecounter()
-            self.curtime = datetime.now()
-            time.sleep(0.1)
-            
-        ##if curtime == START_TIME:
-        print("start")
-        self.run()
-        ##print("start run")
-        
+
     ##command to the rpi camera to take a photo and save it as image in the directory
     ##opening the image to compare
     def takePhoto (self):
-        self.oldImage = self.image                # altes Bild 
-        command = 'raspistill -t 300 -w %i -h %i -o %s -n '
-        os.system(command % (self.WIDTH, self.HEIGHT, self.PATH))
-        self.image = Image.open(self.PATH) 
+        if not self.testing:
+            self.oldImage = self.image                # altes Bild
+            command = 'raspistill -t 300 -w %i -h %i -o %s -n '
+            os.system(command % (self.WIDTH, self.HEIGHT, self.PATH))
+            self.image = Image.open(self.PATH)
 
     ##method to write change values to a csv
     ##crop the two images to a bbox
     def checkMotion (self):                     
-        if self.image and self.oldImage:
+        if self.image and self.oldImage and not self.testing:
             old = self.oldImage.crop(self.BBOX)
             new = self.image.crop(self.BBOX)
             
@@ -130,14 +127,25 @@ class NoSlap:
                     self.alarm = True
                     ##return alarm
                     ##self.playsound()
-                    
-    
+        elif self.testing:
+            timestamp = datetime.now().replace(microsecond=0).replace(tzinfo=pytz.UTC).time().isoformat()
+            print("debug: time: {}, start_time: {}, motiondetect: {}".format(timestamp, self.START_TIME,
+                                                                             self.motiondetect))
+            if timestamp < self.START_TIME:
+                return
+            self.motiondetect += 1
+            if self.motiondetect >= 25:
+                print("Test alarm")
+
     def killplayer (self):
-        os.popen("pkill omxplayer")
-        
+        try:
+            os.popen("pkill omxplayer")
+        except:
+            print("omxplayer not found")
+
     def playsound (self):
         os.popen("omxplayer music/Arctic\ Monkeys\ -\ Do\ I\ Wanna\ Know.mp3 --vol -500 &")
-        print("pass")
+        print("pass 39")
                     
                 
     ##method to detect changes in pixels of the two photos
@@ -157,7 +165,18 @@ class NoSlap:
     ##write a header to the csv file
     ## loop and call the methods every 0.5 seconds, until alarm is reutrned as True
     def run(self):
-        self.killplayer()
+        if not self.testing:
+            self.killplayer()
+
+        # Wait until a the alarm time span
+        self.curtime = datetime.utcnow()
+        while (self.curtime.isoweekday() not in self.DAYS) or (self.curtime.time().isoformat() < self.START_TIME):
+            ##print(curtime)
+            #           currenttime = timecounter()
+            self.curtime = datetime.now()
+            print(self.curtime)
+            time.sleep(2)  # Set back to 0.1
+
         print(self.datafile)
         with open(self.datafile, "w") as file:
             file.write("Timestamp, DifferentPixels")
@@ -168,14 +187,15 @@ class NoSlap:
             curtime = datetime.utcnow()
             self.takePhoto()
             self.checkMotion()
-            print("alarm")    
+            # print("alarm")
             time.sleep(0.2)  # changed from 0.5
-        print("pass")
+        print("pass 30")
         self.playsound()
-        print("pass")
+        print("pass 40")
 
 
 if __name__ == '__main__':
         
-    ##calling the main method with standard parameter
-    no_slap = NoSlap("07:00:00", "08:00:00", days=[1, 2, 3, 4, 5], volume=0, testing=True)
+    ##calling the main method with standard parameter in UTC time
+    no_slap = NoSlap("22:08:30", "23:00:00", days=[1, 2, 3, 4, 5], volume=0, testing=True)
+    no_slap.run()

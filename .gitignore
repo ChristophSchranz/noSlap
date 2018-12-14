@@ -104,8 +104,8 @@ venv.bak/
 .mypy_cache/
 
 
-src/data
-src/music
-src/images
-.idea
+src/data/*
+src/music/*
 
+.idea
+src/motion_measurement.py.save*

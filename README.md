@@ -26,8 +26,8 @@ raspistill -v -o test.jpg
  3. Install noSlap Setup:
 
 ```bash
-git clone https://github.com/...
-cd wakeIO
+git clone https://github.com/ChristophSchranz/noSlap.git
+cd noSlap
 sudo ./install_noSlap.sh
 ```
 
