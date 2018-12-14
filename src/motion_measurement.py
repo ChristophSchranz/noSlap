@@ -4,7 +4,7 @@
 ##Taking photos with the rpi camera and write pixel changes to a log csv file
 
 ##-----------------------------------------------------------------
-import os, time, json, inspect
+import os, sys, time, json, inspect
 from PIL import Image
 from datetime import datetime
 import pytz
@@ -176,7 +176,7 @@ class NoSlap:
             ##print(curtime)
             #           currenttime = timecounter()
             self.curtime = datetime.now()
-            print(self.curtime)
+            print("Current time: {}".format(self.curtime))
             time.sleep(2)  # Set back to 0.1
 
         print(self.datafile)
@@ -198,13 +198,25 @@ class NoSlap:
 
 if __name__ == '__main__':
     timenow = datetime.now().replace(microsecond=0).replace(tzinfo=pytz.UTC).time().isoformat()
-    print(timenow)
+    print("Current time: {}".format(timenow))
     with open(os.sep.join([os.getcwd(), "noSlapServer/no-slaps.json"])) as slaps:
         no_slaps = json.loads(slaps.read())
-    new_slap = None
-    print(no_slaps)
+    next_slap = None
 
+    for slap in no_slaps["NOSLAPS"]:
+        if timenow < slap["START_TIME"]:
+            if next_slap is None or slap["START_TIME"] < next_slap["START_TIME"]:
+                next_slap = slap
+    print("Next Slap: {}".format(next_slap))
 
     # calling the main method with standard parameter in UTC time
-    no_slap = NoSlap("22:08:30", "23:00:00", days=[1, 2, 3, 4, 5], volume=0, testing=True)
-    no_slap.run()
+    if next_slap is not None:
+        start_time = next_slap["START_TIME"]
+        end_time = next_slap["END_TIME"]
+        days = next_slap["DAYS"]
+        volume = next_slap["VOLUME"]
+        testing = False
+
+        no_slap = NoSlap(start_time, end_time, days, volume, testing)
+        # no_slap = NoSlap(**next_slap)
+        no_slap.run()
