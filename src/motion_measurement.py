@@ -53,22 +53,24 @@ class NoSlap:
         self.movingObject = False
         
         ##changing the start and end time to utc format
-        local = pytz.timezone ("Europe/Vienna")
+        # local = pytz.timezone ("Europe/Vienna")
         try:
-            start_datetime = datetime.strptime(" ".join([datetime.utcnow().date().isoformat(), self.START_TIME]), "%Y-%m-%d %H:%M")
+            start_datetime = datetime.strptime(" ".join([datetime.now().date().isoformat(), self.START_TIME]), "%Y-%m-%d %H:%M")
         except ValueError:
-            start_datetime = datetime.strptime(" ".join([datetime.utcnow().date().isoformat(), self.START_TIME]), "%Y-%m-%d %H:%M:%S")
-
-        local_dt = local.localize(start_datetime, is_dst=None)
-        self.START_TIME = local_dt.astimezone(pytz.utc).time().isoformat()
+            start_datetime = datetime.strptime(" ".join([datetime.now().date().isoformat(), self.START_TIME]), "%Y-%m-%d %H:%M:%S")
+        print(start_datetime)
+        # local_dt = local.localize(start_datetime, is_dst=None)
+        # self.START_TIME = local_dt.astimezone(pytz.utc).time().isoformat()
+        self.START_TIME = start_datetime.time().isoformat()
         print("From {}".format(self.START_TIME))
 
         try:
             end_datetime = datetime.strptime (" ".join([datetime.now().date().isoformat(), self.END_TIME]), "%Y-%m-%d %H:%M")
         except ValueError:
             end_datetime = datetime.strptime (" ".join([datetime.now().date().isoformat(), self.END_TIME]), "%Y-%m-%d %H:%M:%S")
-        local_dt = local.localize(end_datetime, is_dst=None)
-        self.END_TIME = local_dt.astimezone(pytz.utc).time().isoformat()
+        # local_dt = local.localize(end_datetime, is_dst=None)
+        # self.END_TIME = local_dt.astimezone(pytz.utc).time().isoformat()
+        self.START_TIME = start_datetime.time().isoformat()
         print("To {}".format(self.END_TIME))
         
         ##looping through the datafiles and remove files older than a week
@@ -195,7 +197,14 @@ class NoSlap:
 
 
 if __name__ == '__main__':
-        
-    ##calling the main method with standard parameter in UTC time
+    timenow = datetime.now().replace(microsecond=0).replace(tzinfo=pytz.UTC).time().isoformat()
+    print(timenow)
+    with open(os.sep.join([os.getcwd(), "noSlapServer/no-slaps.json"])) as slaps:
+        no_slaps = json.loads(slaps.read())
+    new_slap = None
+    print(no_slaps)
+
+
+    # calling the main method with standard parameter in UTC time
     no_slap = NoSlap("22:08:30", "23:00:00", days=[1, 2, 3, 4, 5], volume=0, testing=True)
     no_slap.run()
