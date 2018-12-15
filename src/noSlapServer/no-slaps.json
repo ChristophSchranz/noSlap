@@ -4,11 +4,11 @@
       "DAYS": [
         6
       ],
-      "START_TIME": "12:09:20",
+      "START_TIME": "12:26:20",
       "ACTIVATED": true,
-      "VOLUME": 100,
+      "VOLUME": -200,
       "ID": 0,
-      "END_TIME": "12:09:40"
+      "END_TIME": "12:26:40"
     },
     {
       "DAYS": [
@@ -16,7 +16,7 @@
       ],
       "START_TIME": "11:39:20",
       "ACTIVATED": true,
-      "VOLUME": -100,
+      "VOLUME": -200,
       "ID": 0,
       "END_TIME": "11:49"
     }

@@ -63,10 +63,11 @@ class NoSlapTools:
         os.popen("sudo systemctl daemon-reload")
         os.popen("sudo service noslap-logger restart")
         time.sleep(2)
-        return os.popen("sudo service noslap-logger status")
+        return os.popen("sudo service noslap-logger status").read()
 
     def stop_timers(self):
         os.popen("sudo service noslap-logger stop")
+        os.popen("pkill omxplayer")
         print("Stopped noslap-logger service")
 
 
@@ -224,4 +225,7 @@ if __name__ == '__main__':
     try:
         app.run(host="0.0.0.0", debug=False, port=PORT)
     except KeyboardInterrupt:
+        pass
+    finally:
+        print("Terminate all noslap services")
         noslaptools.stop_timers()
