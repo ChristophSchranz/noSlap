@@ -68,7 +68,7 @@ class NoSlap:
         # local_dt = local.localize(start_datetime, is_dst=None)
         # self.START_TIME = local_dt.astimezone(pytz.utc).time().isoformat()
         self.START_TIME = start_datetime.time().isoformat()
-        self.logger.debug("From {}".format(self.START_TIME))
+        self.logger.info("From {}".format(self.START_TIME))
 
         try:
             end_datetime = datetime.strptime (" ".join([datetime.now().date().isoformat(), self.END_TIME]), "%Y-%m-%d %H:%M")
@@ -77,7 +77,7 @@ class NoSlap:
         # local_dt = local.localize(end_datetime, is_dst=None)
         # self.END_TIME = local_dt.astimezone(pytz.utc).time().isoformat()
         self.START_TIME = start_datetime.time().isoformat()
-        self.logger.debug("To {}".format(self.END_TIME))
+        self.logger.info("To {}".format(self.END_TIME))
         
         ##looping through the datafiles and remove files older than a week
         self.datafile = self.BASEDIR + '/data/data_' + datetime.utcnow().replace(tzinfo=pytz.UTC) \
@@ -187,19 +187,22 @@ class NoSlap:
         self.logger.debug(self.datafile)
         with open(self.datafile, "w") as file:
             file.write("Timestamp, DifferentPixels")
-        curtime = datetime.utcnow()
+        curtime = datetime.now()
         self.logger.debug(curtime.time().isoformat())
         self.alarm = False
         while (self.alarm == False) and (curtime.time().isoformat() < self.END_TIME):##change from alarm == False:
-            curtime = datetime.utcnow()
+            curtime = datetime.now()
             self.takePhoto()
             self.checkMotion()
-            # print("alarm")
             time.sleep(0.2)  # changed from 0.5
-        self.logger.debug("pass 30")
-        self.playsound()
-        self.logger.debug("pass 40")
 
+        self.logger.debug("Play that sound")
+        self.playsound()
+
+        # Wait until the button is pressed or the service restartet
+        while True:  # not button_pressed
+            time.sleep(0.2)
+        self.logger.info("Button was pressed, terminating program now")
 
 if __name__ == '__main__':
     timenow = datetime.now().replace(microsecond=0).replace(tzinfo=pytz.UTC).time().isoformat()
@@ -214,7 +217,7 @@ if __name__ == '__main__':
                 next_slap = slap
     print("Next Slap: {}".format(next_slap))
 
-    next_slap = no_slaps["NOSLAPS"][-1]  # remove
+    # next_slap = no_slaps["NOSLAPS"][-1]  # remove
     # calling the main method with standard parameter in UTC time
     if next_slap is not None:
         start_time = next_slap["START_TIME"]

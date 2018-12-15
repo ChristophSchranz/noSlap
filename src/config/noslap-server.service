@@ -5,8 +5,8 @@ After=network.target
 [Service]
 User=pi
 Group=pi
-WorkingDirectory=/home/pi/noSlap/src/noSlapServer
-ExecStart=/usr/bin/python3 /home/pi/noSlap/src/noSlapServer/noslap-server.py
+WorkingDirectory=/home/pi/noSlap/src/
+ExecStart=/usr/bin/python3 /home/pi/noSlap/src/noslap-server.py
 Restart=always
 
 [Install]

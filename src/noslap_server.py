@@ -11,9 +11,9 @@ from datetime import datetime
 from dateutil.parser import parse
 from flask import Flask, jsonify, request, render_template, redirect, abort
 from redis import Redis
-from multiprocessing import Process
+#from multiprocessing import Process
 
-from src.motion_measurement import NoSlap
+#from src.motion_measurement import NoSlap
 
 __date__ = "14 Dezember 2018"
 __version__ = "0.1"
@@ -60,21 +60,14 @@ class NoSlapTools:
             sys.exit()
 
     def start_timers(self):
-        noslaps = json.loads(open(slap_file).read())
-        for slap in noslaps["NOSLAPS"]:
-            print(slap)
-            if slap["ACTIVATED"]:
-                # no_slap = NoSlap(slap["START_TIME"], slap["END_TIME"], days=slap["DAYS"], volume=slap["VOLUME"], testing=False)
-                no_slap = Process(target=NoSlap, args=(slap["START_TIME"], slap["END_TIME"],
-                                                       slap["DAYS"], slap["VOLUME"], False,))
-                no_slap.start()
-                print("hello")
-                self.noslaplist.append(no_slap)
+        os.popen("sudo systemctl daemon-reload")
+        os.popen("sudo service noslap-logger restart")
+        time.sleep(2)
+        return os.popen("sudo service noslap-logger status")
 
     def stop_timers(self):
-        for noslap in self.noslaplist:
-            noslap.join()
-        print("Removed all players")
+        os.popen("sudo service noslap-logger stop")
+        print("Stopped noslap-logger service")
 
 
 # http://0.0.0.0:6789/
@@ -129,6 +122,7 @@ def delete_noslap(slapid):
         noslaps["NOSLAPS"][i]["ID"] = i
     logger.info("Deleted no slap with id: {}".format(slapid))
 
+    noslaptools.start_timers()
     with open(slap_file, "w") as f:
         f.write(json.dumps(noslaps, indent=2))
     return redirect("/noslaps")
@@ -156,7 +150,7 @@ def edit_noslap(slapid):
         with open(slap_file, "w") as f:
             f.write(json.dumps(noslaps, indent=2))
 
-        noslaptools.stop_timers()
+#        noslaptools.stop_timers()
         noslaptools.start_timers()
         logger.info("Updated noslaps.")
         return redirect("/noslaps")
@@ -216,15 +210,18 @@ def edit_filaments():
 
 
 if __name__ == '__main__':
+    logging.basicConfig()
     logger = logging.getLogger("NoSlapServer")
     logger.setLevel(logging.INFO)
-    logging.basicConfig()
-    #noslaptools = NoSlapTools()
-    #noslaptools.run_tests()
 
-    res = os.popen("ls -la").read()
+    noslaptools = NoSlapTools()
+    noslaptools.run_tests()
+
+    res = noslaptools.start_timers()
     print(res)
 
     logger.info("Starting NoSlap Server on port: {}".format(PORT))
-
-    app.run(host="0.0.0.0", debug=False, port=PORT)
+    try:
+        app.run(host="0.0.0.0", debug=False, port=PORT)
+    except KeyboardInterrupt:
+        noslaptools.stop_timers()
