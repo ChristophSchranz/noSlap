@@ -109,3 +109,4 @@ src/music/*
 
 .idea
 src/motion_measurement.py.save*
+src/images/image.jpg
