@@ -215,17 +215,18 @@ if __name__ == '__main__':
     logger = logging.getLogger("NoSlapServer")
     logger.setLevel(logging.INFO)
 
-    noslaptools = NoSlapTools()
-    noslaptools.run_tests()
+    while True:
+        noslaptools = NoSlapTools()
+        noslaptools.run_tests()
 
-    res = noslaptools.start_timers()
-    print(res)
+        res = noslaptools.start_timers()
+        print(res)
 
-    logger.info("Starting NoSlap Server on port: {}".format(PORT))
-    try:
-        app.run(host="0.0.0.0", debug=False, port=PORT)
-    except KeyboardInterrupt:
-        pass
-    finally:
-        print("Terminate all noslap services")
-        noslaptools.stop_timers()
+        logger.info("Starting NoSlap Server on port: {}".format(PORT))
+        try:
+            app.run(host="0.0.0.0", debug=False, port=PORT)
+        except KeyboardInterrupt:
+            pass
+        finally:
+            print("Terminate all noslap services")
+            noslaptools.stop_timers()

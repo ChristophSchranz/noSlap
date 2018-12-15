@@ -2,23 +2,19 @@
   "NOSLAPS": [
     {
       "DAYS": [
-        6
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
       ],
-      "START_TIME": "12:26:20",
       "ACTIVATED": true,
-      "VOLUME": -200,
+      "END_TIME": "07:30",
+      "START_TIME": "06:45",
       "ID": 0,
-      "END_TIME": "12:26:40"
-    },
-    {
-      "DAYS": [
-        6
-      ],
-      "START_TIME": "11:39:20",
-      "ACTIVATED": true,
-      "VOLUME": -200,
-      "ID": 0,
-      "END_TIME": "11:49"
+      "VOLUME": -200
     }
   ]
 }
