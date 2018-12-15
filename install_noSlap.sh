@@ -19,8 +19,8 @@ if [ "$result" != "detected=0" ]; then
 	sudo sh -c "echo 'disable_camera_led=1' >> /boot/co"
 	# Turn off raspberry pi camera light
 	cat /boot/config.txt | grep -v 'Added by noSlap to turn off the camera light' | grep -v 'disable_camera_led' > boot_config.txt
-	sudo cp boot_config.txt /boot/config.txt
-	sudo rm boot_config.txt
+	sudo cp boot_config.txt /boot/config.txt.save
+	# sudo rm boot_config.txt
 	sudo sh -c "echo 'Added by noSlap to turn off the camera light' >> /boot/config.txt"
 	sudo sh -c "echo 'disable_camera_led=1' >> /boot/config.txt"
 
