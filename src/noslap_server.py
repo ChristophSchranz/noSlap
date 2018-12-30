@@ -11,7 +11,6 @@ from datetime import datetime
 from dateutil.parser import parse
 from flask import Flask, jsonify, request, render_template, redirect, abort
 from redis import Redis
-#from multiprocessing import Process
 
 #from src.motion_measurement import NoSlap
 
@@ -58,6 +57,7 @@ class NoSlapTools:
         if len(self.noslaps) == 0:
             print("Invalid no-slaps.json")
             sys.exit()
+        print("Tests were successful")
 
     def start_timers(self):
         os.popen("sudo systemctl daemon-reload")
@@ -91,23 +91,35 @@ def print_status():
 @app.route('/')
 @app.route('/home', methods=['GET', 'POST'])
 def home():
-    noslaps = json.loads(open(slap_file).read())
-
-    # only show active NoSlaps for the next 24 hours.
+    """
+    Finds the next slap and renders it in the template
+    :return:
+    """
+    print("\nNext noSlap:")
     dayofweek = datetime.now().isoweekday()
     hourofday = ":".join(datetime.now().time().isoformat().split(":")[:2])
-    slaps = [slap for slap in noslaps["NOSLAPS"]
-             if ((dayofweek in slap["DAYS"]
-                    and hourofday < slap["START_TIME"])
-                  or (((dayofweek+1) % 7) in slap["DAYS"]
-                    and hourofday > slap["START_TIME"]))
-                and slap["ACTIVATED"]]
 
-    logger.info("Next NoSlaps: {}".format(slaps))
+    noslaps = json.loads(open(slap_file).read())
 
-    return render_template('noSlapServer/app/home.html', noslaps=slaps,
-                           noslaps_string=["There are no NoSlaps in the next 24 hours."
-                                           if len(slaps) == 0 else ""][0])
+    # Check for the next Slap on the same day:
+    next_slap = None
+    next_start = "24:00"
+    for slap in noslaps["NOSLAPS"]:
+        if dayofweek in slap["DAYS"] and hourofday < slap["START_TIME"] and slap["START_TIME"] < next_start and slap["ACTIVATED"]:
+            next_start = slap["START_TIME"]
+            next_slap = slap
+
+    # If there are no slaps on the same day, check the next day
+    if next_slap is None:
+        for slap in noslaps["NOSLAPS"]:
+            if ((dayofweek-1) % 7)+1 in slap["DAYS"] and slap["START_TIME"] < next_start and slap["ACTIVATED"]:
+                next_start = slap["START_TIME"]
+                next_slap = slap
+
+    print("The next slap is on {} slap: {}".format(next_start, next_slap))
+
+    return render_template('noSlapServer/app/home.html', noslaps=[next_slap],
+                           noslaps_string=["There are no outstanding NoSlaps." if next_slap is None else ""][0])
 
 
 @app.route('/delete-noslap/<int:slapid>')
