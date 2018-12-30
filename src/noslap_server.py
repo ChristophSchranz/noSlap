@@ -118,8 +118,9 @@ def home():
 
     print("The next slap is on {} slap: {}".format(next_start, next_slap))
 
-    return render_template('noSlapServer/app/home.html', noslaps=[next_slap],
-                           noslaps_string=["There are no outstanding NoSlaps." if next_slap is None else ""][0])
+    return render_template('noSlapServer/app/home.html', noslap=next_slap,
+                           noslap_string=["There are no outstanding NoSlaps." if next_slap is None else ""][0])
+    # return render_template('noSlapServer/app/home.html')
 
 
 @app.route('/delete-noslap/<int:slapid>')
@@ -210,9 +211,9 @@ def edit_filaments():
             settings = json.loads(request.form["textbox"])
             with open(settings_file, "w") as f:
                 f.write(json.dumps(settings, indent=2))
-            logger.info("Updated settings")
+            logger.info("updated settings")
             settings = open(settings_file).read()
-            return render_template('app/settings.html', status="Settings were saved", settings=settings)
+            return render_template('noSlapServer/app/settings.html', status="settings were saved", settings=settings)
         except json.decoder.JSONDecodeError:
             logger.warning("Invalid filaments.json")
             return jsonify("Invalid json")
@@ -236,9 +237,9 @@ if __name__ == '__main__':
 
         logger.info("Starting NoSlap Server on port: {}".format(PORT))
         try:
-            app.run(host="0.0.0.0", debug=False, port=PORT)
+            app.run(host="0.0.0.0", debug=True, port=PORT)
         except KeyboardInterrupt:
             pass
         finally:
-            print("Terminate all noslap services")
+            print("terminate all noslap services")
             noslaptools.stop_timers()

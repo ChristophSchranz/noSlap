@@ -1,29 +1,23 @@
-<!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/html">
-<head>
-    <meta charset="UTF-8">
-    <title>My NoSlaps</title>
-    <a href="/home" class="button">Home </a>
-    <a href="/noslaps" class="button">NoSlap-Timers</a>
-    <a href="/settings" class="button">Settings</a>
+{% extends 'noSlapServer/app/layout.html' %}
 
-</head>
-<body>
-<h1>NoSlap Timers</h1>
+{% block body %}
 
-<!--{{noslaps[0]}} -->
+    <h1>any slaps</h1>
 
+
+    <ul class="list-group">
 <table style="width:75%">
-      <tr>
-    <th>ID</th>
-    <th>Start Time</th>
-    <th>End Time</th>
-    <th>Days</th>
-    <th>Volume</th>
-    <th>Activated</th>
+
+    <tr>
+    <th>id</th>
+    <th>start time</th>
+    <th>end time</th>
+    <th>days</th>
+    <th>volume</th>
+    <th>activated</th>
     <th> </th>
   </tr>
-    <ol>
+
         {% for slap in noslaps %}
           <tr>
     <td>{{slap.ID}}</td>
@@ -32,17 +26,17 @@
     <td>{{slap.DAYS}}</td>
     <td>{{slap.VOLUME}}</td>
     <td>{{slap.ACTIVATED}}</td>
-    <td><a href="/edit-noslap/{{slap.ID}}"> Edit </a></td>
-    <td><a href="/delete-noslap/{{slap.ID}}"> X </a></td>
+    <td><a href="/edit-noslap/{{slap.ID}}" class="btn btn-warning"> edit </a></td>
+    <td><a href="/delete-noslap/{{slap.ID}}" class="btn btn-danger"> x </a></td>
   </tr>
 {% endfor %}
 
-    </ol>
 </table>
-    <!--{{noslaps[0]}} -->
-<p> {{noslaps_string}}</p>
+    </ul>
 
-<a href="/edit-noslap/"> Add new timer </a>
+<p> {{noslap_string}}</p>
 
-</body>
-</html>
+
+<a href="/edit-noslap/"class="btn btn-primary"> add new timer </a>
+
+{% endblock %}

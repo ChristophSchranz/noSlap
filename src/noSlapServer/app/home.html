@@ -1,57 +1,45 @@
-<!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/html">
-<head>
-    <meta charset="UTF-8">
-    <title>NoSlap Home</title>
-    <a href="/home" class="button">Home </a>
-    <a href="/noslaps" class="button">NoSlap-Timers</a>
-    <a href="/settings" class="button">Settings</a>
-
-</head>
-<body>
-<h3>Because a wonderful morning doesn't begin with a Slap.</h3>
- It is:
-<p><span id="datetime"></span></p>
-
-<script>
-var dt = new Date();
-document.getElementById("datetime").innerHTML = dt.toLocaleString();
-</script>
+{% extends 'noSlapServer/app/layout.html' %}
 
 
-<h2>Next NoSlaps:</h2>
+{% block body %}
+<h3>because a wonderful morning doesn't begin with a Slap.</h3>
 
+    <div class="jumbotron text-center">
+        <p><span id="datetime"></span></p>
+        <script>
+        var dt = new Date();
+        document.getElementById("datetime").innerHTML = dt.toLocaleString();
+        </script>
 
-<table style="width:75%">
-      <tr>
-    <th>ID</th>
-    <th>Start Time</th>
-    <th>End Time</th>
-    <th>Days</th>
-    <th>Volume</th>
-    <th>Activated</th>
+    <h3>my next no Slap:</h3>
+
+<table style="width:100%">
+    <tr>
+    <th>id</th>
+    <th>start time</th>
+    <th>end time</th>
+    <th>days</th>
+    <th>volume</th>
+    <th>activated</th>
     <th> </th>
   </tr>
-    <ol>
-        {% for slap in noslaps %}
           <tr>
-    <td>{{slap.ID}}</td>
-    <td>{{slap.START_TIME}}</td>
-    <td>{{slap.END_TIME}}</td>
-    <td>{{slap.DAYS}}</td>
-    <td>{{slap.VOLUME}}</td>
-    <td>{{slap.ACTIVATED}}</td>
-    <td><a href="/edit-noslap/{{slap.ID}}"> Edit </a></td>
-    <td><a href="/delete-noslap/{{slap.ID}}"> X </a></td>
+    <td>{{noslap.ID}}</td>
+    <td>{{noslap.START_TIME}}</td>
+    <td>{{noslap.END_TIME}}</td>
+    <td>{{noslap.DAYS}}</td>
+    <td>{{noslap.VOLUME}}</td>
+    <td>{{noslap.ACTIVATED}}</td>
+    <td><a href="/edit-noslap/{{noslap.ID}}" class="btn btn-warning"> edit </a></td>
+    <td><a href="/delete-noslap/{{noslap.ID}}" class="btn btn-danger"> x </a></td>
   </tr>
-{% endfor %}
 
-    </ol>
 </table>
-    <!--{{noslaps[0]}} -->
-<p> {{noslaps_string}}</p>
 
-<a href="/edit-noslap/"> Add new timer </a>
+<p> {{noslap_string}}</p>
 
-</body>
-</html>
+<a href="/edit-noslap/"class="btn btn-primary"> add new timer </a>
+
+
+  </div>
+{% endblock %}
