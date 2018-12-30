@@ -204,18 +204,43 @@ class NoSlap:
             time.sleep(0.2)
         self.logger.info("Button was pressed, terminating program now")
 
-if __name__ == '__main__':
-    timenow = datetime.now().replace(microsecond=0).replace(tzinfo=pytz.UTC).time().isoformat()
-    print("Current time: {}".format(timenow))
-    with open(os.sep.join([os.getcwd(), "noSlapServer/no-slaps.json"])) as slaps:
-        no_slaps = json.loads(slaps.read())
-    next_slap = None
 
-    for slap in no_slaps["NOSLAPS"]:
-        if timenow < slap["START_TIME"]:
-            if next_slap is None or slap["START_TIME"] < next_slap["START_TIME"]:
+if __name__ == '__main__':
+    # timenow = datetime.now().replace(microsecond=0).replace(tzinfo=pytz.UTC).time().isoformat()
+    # print("Current time: {}".format(timenow))
+    # with open(os.sep.join([os.getcwd(), "noSlapServer/no-slaps.json"])) as slaps:
+    #     no_slaps = json.loads(slaps.read())
+    # next_slap = None
+    #
+    # for slap in no_slaps["NOSLAPS"]:
+    #     if timenow < slap["START_TIME"]:
+    #         if next_slap is None or slap["START_TIME"] < next_slap["START_TIME"]:
+    #             next_slap = slap
+    # print("Next Slap: {}".format(next_slap))
+
+    print("\nNext noSlap:")
+    dayofweek = datetime.now().isoweekday()
+    hourofday = ":".join(datetime.now().time().isoformat().split(":")[:2])
+
+    with open(os.sep.join([os.getcwd(), "noSlapServer/no-slaps.json"])) as slaps:
+        noslaps = json.loads(slaps.read())
+
+    # Check for the next Slap on the same day:
+    next_slap = None
+    next_start = "24:00"
+    for slap in noslaps["NOSLAPS"]:
+        if dayofweek in slap["DAYS"] and hourofday < slap["START_TIME"] and slap["START_TIME"] < next_start and slap["ACTIVATED"]:
+            next_start = slap["START_TIME"]
+            next_slap = slap
+
+    # If there are no slaps on the same day, check the next day
+    if next_slap is None:
+        for slap in noslaps["NOSLAPS"]:
+            if ((dayofweek - 1) % 7) + 1 in slap["DAYS"] and slap["START_TIME"] < next_start and slap["ACTIVATED"]:
+                next_start = slap["START_TIME"]
                 next_slap = slap
-    print("Next Slap: {}".format(next_slap))
+
+    print("The next slap is on {} slap: {}".format(next_start, next_slap))
 
     # next_slap = no_slaps["NOSLAPS"][-1]  # remove
     # calling the main method with standard parameter in UTC time
