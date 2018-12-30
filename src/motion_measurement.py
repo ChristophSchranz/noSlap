@@ -172,21 +172,23 @@ class NoSlap:
     ##write a header to the csv file
     ## loop and call the methods every 0.5 seconds, until alarm is reutrned as True
     def run(self):
-        print("Run run(), Starttime: {}, DayofWeeks: {}".format(self.START_TIME, self.DAYS))
+        self.logger.info("Run run(), Starttime: {}, DayofWeeks: {}".format(self.START_TIME, self.DAYS))
         if not self.testing:
             self.killplayer()
 
         # Wait until a the alarm time span
         self.curtime = datetime.now()
-        print(self.curtime)
-        while (self.curtime.isoweekday() in slap["DAYS"] not in self.DAYS) or (self.curtime.time().isoformat() < self.START_TIME):
+        c = 0
+        while (self.curtime.isoweekday() not in self.DAYS or self.curtime.time().isoformat() < self.START_TIME):
             ##print(curtime)
             #           currenttime = timecounter()
             self.curtime = datetime.now()
-            self.logger.debug("Current time: {}".format(self.curtime))
-            time.sleep(2)  # Set back to 0.1
+            if (c % 2 == 0):
+                self.logger.debug("Current time: {}".format(self.curtime))
+            time.sleep(1)  # Set back to 0.1
+            c += 1
 
-        self.logger.debug(self.datafile)
+        self.logger.debug("The time has come: {}".format(self.datafile))
         with open(self.datafile, "w") as file:
             file.write("Timestamp, DifferentPixels")
         curtime = datetime.now()
@@ -251,7 +253,7 @@ if __name__ == '__main__':
         end_time = next_slap["END_TIME"]
         days = next_slap["DAYS"]
         volume = next_slap["VOLUME"]
-        testing = True
+        testing = False
 
         no_slap = NoSlap(start_time, end_time, days, volume, testing)
         # no_slap = NoSlap(**next_slap)
