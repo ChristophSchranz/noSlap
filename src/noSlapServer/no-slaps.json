@@ -1,19 +1,30 @@
 {
   "NOSLAPS": [
     {
-      "END_TIME": "23:55",
-      "VOLUME": 100,
       "ID": 0,
+      "START_TIME": "08:00",
+      "END_TIME": "08:30",
       "DAYS": [
-        7
+        1,
+        3
       ],
-      "ACTIVATED": true,
-      "START_TIME": "23:47"
+      "VOLUME": 36,
+      "ACTIVATED": true
     },
     {
-      "END_TIME": "08:30",
-      "VOLUME": 36,
+      "END_TIME": "13:45",
+      "VOLUME": 100,
       "ID": 1,
+      "DAYS": [
+        1
+      ],
+      "ACTIVATED": true,
+      "START_TIME": "13:08"
+    },
+    {
+      "ID": 2,
+      "START_TIME": "07:00",
+      "END_TIME": "08:00",
       "DAYS": [
         1,
         2,
@@ -21,18 +32,8 @@
         4,
         5
       ],
-      "ACTIVATED": true,
-      "START_TIME": "08:00"
-    },
-    {
-      "END_TIME": "13:45",
-      "VOLUME": 100,
-      "ID": 2,
-      "DAYS": [
-        1
-      ],
-      "ACTIVATED": true,
-      "START_TIME": "13:08"
+      "VOLUME": 36,
+      "ACTIVATED": true
     }
   ]
 }

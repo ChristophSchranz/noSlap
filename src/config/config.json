@@ -1,8 +1,8 @@
 {
-    "MAGNITUE_THRESHOLD": 50,
-    "MIN_CHANGE": 30,
-        "MAX_CHANGE": 20000,
-        "RECENT_VALUES": 10,
-        "AWAKE": 5,
-    "PORT": 1810
+  "MAGNITUE_THRESHOLD": 50,
+  "MIN_CHANGE": 30,
+  "MAX_CHANGE": 20000,
+  "RECENT_VALUES": 10,
+  "AWAKE": 5,
+  "PORT": 1811
 }

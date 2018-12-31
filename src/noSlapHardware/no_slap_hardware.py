@@ -32,7 +32,6 @@ class noSlapHardware:
         return status
 
 
-
 if __name__ == "__main__":
     noslaphw = noSlapHardware()
 

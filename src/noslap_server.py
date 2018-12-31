@@ -4,7 +4,6 @@ import os
 import sys
 import json
 import time
-import socket
 import pytz
 import logging
 from datetime import datetime
@@ -12,9 +11,7 @@ from dateutil.parser import parse
 from flask import Flask, jsonify, request, render_template, redirect, abort
 from redis import Redis
 
-#from src.motion_measurement import NoSlap
-
-__date__ = "14 Dezember 2018"
+__date__ = "31 Dezember 2018"
 __version__ = "0.1"
 __email__ = "christoph.schranz@salzburgresearch.at"
 __status__ = "Development"
@@ -25,7 +22,7 @@ PORT = int(os.getenv("PORT", "1811"))
 # Creating dashboard
 path = os.path.dirname(os.path.abspath(__file__))
 slap_file = os.path.join(path, "noSlapServer", "no-slaps.json")
-settings_file = os.path.join(path, "noSlapServer", "settings.json")
+config_file = os.path.join(path, "config", "config.json")
 
 # webservice setup
 app = Flask(__name__, template_folder=path)
@@ -35,15 +32,17 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 
 
 class NoSlapTools:
+    """
+    Toolset for handling with the noslap alarm service.
+    """
     def __init__(self):
-        self.settings = json.loads(open(settings_file).read())
+        self.config = json.loads(open(config_file).read())
         self.noslaps = json.loads(open(slap_file).read())
         self.noslaplist = list()
 
     def get_dt(self, request):
         # dt_default = datetime.now().isoformat()
         dt = request.form.get('datetime', "")
-
         try:
             validstring = parse(dt).replace(tzinfo=pytz.UTC).isoformat()
             return validstring
@@ -51,8 +50,8 @@ class NoSlapTools:
             return "invalid datetime"
 
     def run_tests(self):
-        if len(self.settings) == 0:
-            print("Invalid settings.json")
+        if len(self.config) == 0:
+            print("Invalid config.json")
             sys.exit()
         if len(self.noslaps) == 0:
             print("Invalid no-slaps.json")
@@ -61,17 +60,17 @@ class NoSlapTools:
 
     def start_timers(self):
         os.popen("sudo systemctl daemon-reload")
-        os.popen("sudo service noslap-logger restart")
+        os.popen("sudo service noslap-alarm restart")
         time.sleep(2)
-        return os.popen("sudo service noslap-logger status").read()
+        return os.popen("sudo service noslap-alarm status").read()
 
     def stop_timers(self):
-        os.popen("sudo service noslap-logger stop")
+        os.popen("sudo service noslap-alarm stop")
         os.popen("pkill omxplayer")
-        print("Stopped noslap-logger service")
+        print("Stopped noslap-alarm service")
 
 
-# http://0.0.0.0:6789/
+# http://0.0.0.0:1811/
 @app.route('/status')
 def print_status():
     """
@@ -178,16 +177,23 @@ def edit_noslap(slapid):
             starttime = noslaps["NOSLAPS"][slapid]["START_TIME"]
             endtime = noslaps["NOSLAPS"][slapid]["END_TIME"]
             def_volume = noslaps["NOSLAPS"][slapid]["VOLUME"]
+            days = noslaps["NOSLAPS"][slapid]["DAYS"]
         else:  # in this case, we add a no slap
             starttime = "07:00"
             endtime = "08:00"
-            def_volume = "100"
+            def_volume = "36"
+            days = [1, 2, 3, 4, 5]
         return render_template('noSlapServer/app/edit-noslap.html', select_day=select_day,
-                               starttime=starttime, endtime=endtime, def_volume=def_volume)
+                               starttime=starttime, endtime=endtime, def_volume=def_volume, days=days)
 
 
 @app.route('/edit-noslap/', methods=['GET', 'POST'])
 def add_no_slap():
+    """
+    This function is called if a new slap is added,
+    therefore it is redirected to the subsequent id.
+    :return:
+    """
     noslaps = json.loads(open(slap_file).read())
     slapid = len(noslaps["NOSLAPS"])
     return redirect("/edit-noslap/{}".format(slapid))
@@ -195,8 +201,12 @@ def add_no_slap():
 
 @app.route('/noslaps', methods=['GET', 'POST'])
 def my_no_slaps():
+    """
+    List all slaps
+    :return:
+    """
     noslaps = json.loads(open(slap_file).read())
-    if noslaps["NOSLAPS"] == []:
+    if noslaps["NOSLAPS"] is list():
         noslaps_string = "There are no NoSlaps in the next 20 hours."
     else:
         noslaps_string = ""
@@ -205,21 +215,26 @@ def my_no_slaps():
 
 
 @app.route('/settings', methods=['GET', 'POST'])
-def edit_filaments():
+def edit_settings():
+    """
+    Set the internal configs and threshold.
+    Writes back into file pretty after reading.
+    :return:
+    """
     if request.method == 'POST':
         try:
             settings = json.loads(request.form["textbox"])
-            with open(settings_file, "w") as f:
+            with open(config_file, "w") as f:
                 f.write(json.dumps(settings, indent=2))
             logger.info("updated settings")
-            settings = open(settings_file).read()
+            settings = open(config_file).read()
             return render_template('noSlapServer/app/settings.html', status="settings were saved", settings=settings)
         except json.decoder.JSONDecodeError:
             logger.warning("Invalid filaments.json")
             return jsonify("Invalid json")
 
     else:
-        settings = open(settings_file).read()
+        settings = open(config_file).read()
         return render_template('noSlapServer/app/settings.html', settings=settings)
 
 

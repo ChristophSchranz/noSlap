@@ -8,22 +8,24 @@
 
 <form method="POST">
 
-    Start Time <input type="time" id="starttime" name="starttime" value={{starttime}} required>
+    start time <input type="time" id="starttime" name="starttime" value={{starttime}} required>
 
-    End Time <input type="time" id="endtime" name="endtime" value={{endtime}} required>
+    end time <input type="time" id="endtime" name="endtime" value={{endtime}} required>
     <br>
     <h2><font color="red">{{select_day}}</font></h2>
-    <input type="checkbox" value=1 name="day"> Monday
-    <input type="checkbox" value=2 name="day"> Tuesday
-    <input type="checkbox" value=3 name="day"> Wednesday
-    <input type="checkbox" value=4 name="day"> Thursday
-    <input type="checkbox" value=5 name="day"> Friday
-    <input type="checkbox" value=6 name="day"> Saturday
-    <input type="checkbox" value=7 name="day"> Sunday
-    <br>
-    Volume (milli dB) <input type="number" name="Volume" min="-1000" max="1000" value={{def_volume}}>
 
-    Activate <input type="checkbox" value="true" name="activated" checked>
+    <input type="checkbox" value=1 name="day" {% if 1 in days %} checked {% endif %}> monday
+
+    <input type="checkbox" value=2 name="day" {% if 2 in days %} checked {% endif %}> tuesday
+    <input type="checkbox" value=3 name="day" {% if 3 in days %} checked {% endif %}> wednesday
+    <input type="checkbox" value=4 name="day" {% if 4 in days %} checked {% endif %}> thursday
+    <input type="checkbox" value=5 name="day" {% if 5 in days %} checked {% endif %}> friday
+    <input type="checkbox" value=6 name="day" {% if 6 in days %} checked {% endif %}> saturday
+    <input type="checkbox" value=7 name="day" {% if 7 in days %} checked {% endif %}> sunday
+    <br>
+    volume (milli dB) <input type="number" name="Volume" min="-1000" max="1000" value={{def_volume}}>
+
+    activate <input type="checkbox" value="true" name="activated" checked>
 
     <br>
     <br>
