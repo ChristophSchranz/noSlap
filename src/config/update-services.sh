@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 echo "Updating noSlap services"
 sudo systemctl daemon-reload
-sudo systemctl start noslap-alarm
-sudo systemctl enable noslap-alarm
+
 sudo systemctl start noslap-server
 sudo systemctl enable noslap-server
 sleep 5

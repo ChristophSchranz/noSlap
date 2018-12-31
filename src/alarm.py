@@ -57,7 +57,7 @@ class NoSlap:
         self.pImage=None                          
         self.oldImage=None                      
         self.movingObject = False
-        
+
         ##changing the start and end time to utc format
         # local = pytz.timezone ("Europe/Vienna")
         try:
@@ -169,7 +169,7 @@ class NoSlap:
                     changed += 1
         return changed      
 
-    ##write a header to the csv file
+    ## write a header to the csv file
     ## loop and call the methods every 0.5 seconds, until alarm is reutrned as True
     def run(self):
         self.logger.info("Run run(), Starttime: {}, DayofWeeks: {}".format(self.START_TIME, self.DAYS))
@@ -179,9 +179,7 @@ class NoSlap:
         # Wait until a the alarm time span
         self.curtime = datetime.now()
         c = 0
-        while not (self.curtime.isoweekday() in self.DAYS and self.curtime.time().isoformat() >= self.START_TIME):
-            ##print(curtime)
-            #           currenttime = timecounter()
+        while not (self.curtime.isoweekday() in self.DAYS and self.curtime.time().isoformat() > self.START_TIME):
             self.curtime = datetime.now()
             if (c % 10 == 0):
                 self.logger.debug("Current time: {}, day: {}".format(self.curtime, self.curtime.isoweekday()))
@@ -203,25 +201,13 @@ class NoSlap:
         self.logger.debug("Play that sound")
         self.playsound()
 
-        # Wait until the button is pressed or the service restartet
-        while True:  # not button_pressed
-            time.sleep(0.2)
-        self.logger.info("Button was pressed, terminating program now")
+        # # Wait until the button is pressed or the service restartet
+        # while True:  # TODO not button_pressed
+        #     time.sleep(0.2)
+        # self.logger.info("Button was pressed, terminating program now")
 
 
 if __name__ == '__main__':
-    # timenow = datetime.now().replace(microsecond=0).replace(tzinfo=pytz.UTC).time().isoformat()
-    # print("Current time: {}".format(timenow))
-    # with open(os.sep.join([os.getcwd(), "noSlapServer/no-slaps.json"])) as slaps:
-    #     no_slaps = json.loads(slaps.read())
-    # next_slap = None
-    #
-    # for slap in no_slaps["NOSLAPS"]:
-    #     if timenow < slap["START_TIME"]:
-    #         if next_slap is None or slap["START_TIME"] < next_slap["START_TIME"]:
-    #             next_slap = slap
-    # print("Next Slap: {}".format(next_slap))
-
     print("\nNext noSlap:")
     dayofweek = datetime.now().isoweekday()
     hourofday = ":".join(datetime.now().time().isoformat().split(":")[:2])
@@ -249,13 +235,8 @@ if __name__ == '__main__':
     # next_slap = no_slaps["NOSLAPS"][-1]  # remove
     # calling the main method with standard parameter in UTC time
     if next_slap is not None:
-        start_time = next_slap["START_TIME"]
-        end_time = next_slap["END_TIME"]
-        days = next_slap["DAYS"]
-        volume = next_slap["VOLUME"]
         testing = False
-
-        no_slap = NoSlap(start_time, end_time, days, volume, testing)
-        # no_slap = NoSlap(**next_slap)
+        no_slap = NoSlap(next_slap["START_TIME"], next_slap["END_TIME"],
+                         next_slap["DAYS"], next_slap["VOLUME"], testing)
         no_slap.run()
 

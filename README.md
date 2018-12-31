@@ -16,13 +16,6 @@ you in the sleep phase you are ready to get up.
 ## Requirements:
  1. Raspberry Pi with running debian
  2. Raspberry Pi Camera
-Check if the Camera works
-```bash
-vcgencmd get_camera
--> supported=1 detected=1
-raspistill -v -o test.jpg
-```
-
  3. Install noSlap Setup:
 
 ```bash
@@ -33,23 +26,40 @@ sudo ./install_noSlap.sh
 
 In install_noSlap.sh, we:
 
-* check if cam works
+*   Check if the Camera works
 
-* install required packages
+        vcgencmd get_camera
+        -> supported=1 detected=1
+        raspistill -v -o test.jpg
 
-* create noSlap.service
+*   Install required packages
 
-* enable autostart
+*   Create and preconfigure `noslap-server.service` and `noslap-alarm.service` in `/etc/systemd/system`.
 
-* Start the Service
+*   Start `noslap-server.service`
 
+
+Make sure that the Raspberry Pi connects to your hotspot, e.g. with the following `/etc/dhcpcd.conf` addendum:
+
+The Server will be available from your smartphone on [192.168.43.40:1811](192.168.43.40:1811)
+    
+    interface wlan0
+    static ip_address=192.168.43.40/24
+    static routers=192.168.43.1
+    static domain_name_servers=192.168.43.1
+    
+    interface wlan1
+    static ip_address=192.168.48.171/24
+    static routers=192.168.48.1
+    static domain_name_servers=192.168.48.2,192.168.48.3
+ 
 
 ## Usage
 
 ```bash
-sudo service noslap restart
-sudo service noslap status
-sudo service noslap stop
+sudo service noslap-server restart
+sudo service noslap-server status
+sudo service noslap-server stop
 ```
 
 Open [localhost:1811](0.0.0.0:1811) and Use the service
@@ -57,7 +67,7 @@ Open [localhost:1811](0.0.0.0:1811) and Use the service
 
 ## Configuration
 
-Open [localhost:1811](0.0.0.0:1811), click on on/off, edit wake intevall
+Open [localhost:1811/settings](0.0.0.0:1811/settings)
 
 Configure the settings in 0.0.0.0:1811/settings
 TIME_THRESHOLD, MAGNITUDE_THRESHOLD, DEFAULT_SONG, RADIO
