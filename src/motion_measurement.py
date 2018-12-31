@@ -179,11 +179,11 @@ class NoSlap:
         # Wait until a the alarm time span
         self.curtime = datetime.now()
         c = 0
-        while not (self.curtime.isoweekday() in self.DAYS and self.curtime.time().isoformat() < self.START_TIME):
+        while not (self.curtime.isoweekday() in self.DAYS and self.curtime.time().isoformat() >= self.START_TIME):
             ##print(curtime)
             #           currenttime = timecounter()
             self.curtime = datetime.now()
-            if (c % 2 == 0):
+            if (c % 10 == 0):
                 self.logger.debug("Current time: {}, day: {}".format(self.curtime, self.curtime.isoweekday()))
             time.sleep(1)  # Set back to 0.1
             c += 1
