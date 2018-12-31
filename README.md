@@ -38,6 +38,9 @@ In install_noSlap.sh, we:
 
 *   Start `noslap-server.service`
 
+Check if the user `pi` has permissions to write the data:
+
+    sudo chown -R pi.pi *
 
 Make sure that the Raspberry Pi connects to your hotspot, e.g. with the following `/etc/dhcpcd.conf` addendum:
 
@@ -53,6 +56,7 @@ The Server will be available from your smartphone on [192.168.43.40:1811](192.16
     static routers=192.168.48.1
     static domain_name_servers=192.168.48.2,192.168.48.3
  
+Reboot the Raspberry Pi to make the settings run correctly.
 
 ## Usage
 
