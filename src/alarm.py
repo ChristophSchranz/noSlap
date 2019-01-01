@@ -176,13 +176,22 @@ class NoSlap:
         if not self.testing:
             self.killplayer()
 
+
+        # Wait until the correct day
+        self.curtime = datetime.now()
+        while not (self.curtime.isoweekday() in self.DAYS  and self.curtime.time().isoformat() < self.END_TIME):
+            self.curtime = datetime.now()
+            self.logger.debug("Wait for correct day, Current time: {}, day: {}".format(self.curtime, self.curtime.isoweekday()))
+            time.sleep(10)  # Set back to 0.1
+
+
         # Wait until a the alarm time span
         self.curtime = datetime.now()
         c = 0
-        while not (self.curtime.isoweekday() in self.DAYS and self.curtime.time().isoformat() > self.START_TIME) or self.curtime.time().isoformat() >= self.END_TIME:
+        while not (self.curtime.isoweekday() in self.DAYS and self.curtime.time().isoformat() > self.START_TIME):
             self.curtime = datetime.now()
             if (c % 10 == 0):
-                self.logger.debug("Current time: {}, day: {}".format(self.curtime, self.curtime.isoweekday()))
+                self.logger.debug("Wait for correct time, Current time: {}, day: {}".format(self.curtime, self.curtime.isoweekday()))
             time.sleep(1)  # Set back to 0.1
             c += 1
 
